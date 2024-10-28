@@ -11,14 +11,21 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
-
+from rich.panel import Panel
 
 # Initialize rich console
 console = Console()
 
 
 def load_env_vars() -> tuple[str, str]:
-    """Load environment variables from .env file"""
+    """Load the API key and model name from environment variables.
+
+    Raises:
+        ValueError: If API_KEY or MODEL_NAME is not set.
+
+    Returns:
+        tuple[str, str]: The API key and model name.
+    """
     try:
         load_dotenv()
         api_key = os.getenv("API_KEY")
@@ -32,12 +39,22 @@ def load_env_vars() -> tuple[str, str]:
 
 
 def init_gemini(api_key: str, model_name: str, config):
-    """Initialize Gemini"""
+    """Initialize Gemini model with given parameters.
+
+    Args:
+        api_key (str): The API key for Gemini.
+        model_name (str): The name of the model to use.
+        config (dict): Configuration parameters for the model.
+
+    Returns:
+        GenerativeModel: The initialized generative model.
+    """
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
             model_name, 
-            generation_config = config)
+            generation_config = config
+        )
         return model
     except Exception as e:
         console.print(f"Error initializing Gemini: {e}", style="bold red")
@@ -45,9 +62,12 @@ def init_gemini(api_key: str, model_name: str, config):
 
 
 def load_configuration() -> dict:
-    """Load configuration parameters from a JSON file"""
+    """Load configuration parameters from a JSON file.
+
+    Returns:
+        dict: Configuration parameters for the model.
+    """
     default_config = {"temperature": 1.0, "max_tokens": 200, "top_k": 40, "top_p": 0.9}
-    
     try:
         with open("config.json", "r") as file:
             config = json.load(file)
@@ -64,9 +84,17 @@ def load_configuration() -> dict:
         top_k=final_config["top_k"],
         top_p=final_config["top_p"]
     )
-
+    
+    
 def start_chat(model):
-    """Start a new chat session"""
+    """Start a new chat session.
+
+    Args:
+        model (GenerativeModel): The generative model to use for the chat.
+
+    Returns:
+        ChatSession: The started chat session.
+    """
     try:
         chat = model.start_chat(history=[])
         return chat
@@ -74,8 +102,9 @@ def start_chat(model):
         console.print(f"Error starting chat session: {e}", style="bold red")
         sys.exit(1) 
 
-        
+
 def print_ascii_art():
+    """Print ASCII art for the chatbot CLI."""
     ascii_art = """
    ___                 __        _   ___ 
   / __|___ _ __  _ __  \_\_     /_\ |_ _|
@@ -85,22 +114,27 @@ def print_ascii_art():
                         
     """    
     console.print(ascii_art, style="bold magenta", highlight=False)
-    
+
 
 def send_message(chat, prompt):
+    """Send user message to Gemini and print the response.
+
+    Args:
+        chat (ChatSession): The chat session.
+        prompt (str): The user's message.
+    """
     try:
         # Send user entry to Gemini and read the response in stream
-        with console.status("[bold cyan]Thinking...[/bold cyan]") as status:
+        with console.status("[bold cyan]Thinking...[/bold cyan]", spinner="dots"):
             response = chat.send_message(prompt)
-        status.stop()
-        console.print(Markdown(response.text), soft_wrap=True)  # Add slight delay to simulate streaming effect
-        
+        console.print(Panel(Markdown(response.text)), soft_wrap=True)
     except Exception as e:
         console.print(f"Error during chat interaction: {e}", style="bold red")
-        sys.exit(1) 
+        sys.exit(1)
 
 
 def main():
+    """Main function to run the chatbot CLI."""
     # Clear terminal and print ascii art
     subprocess.call('clear' if os.name == 'posix' else 'cls', shell=True)
     print_ascii_art()
@@ -128,7 +162,7 @@ def main():
         
         if prompt:
             send_message(chat, prompt)
-            
+
 
 if __name__ == "__main__":
     main()
