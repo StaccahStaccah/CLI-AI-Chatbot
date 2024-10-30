@@ -135,7 +135,7 @@ def send_message(chat, prompt):
             response = chat.send_message(prompt)
         
         # Save chat response to history
-        save_response_to_history(response.text)
+        save_chat_to_history("response", "model", response.text)
         
         console.print(Panel(Markdown(response.text)), soft_wrap=True)
     except Exception as e:
@@ -172,35 +172,11 @@ def main():
         
         if prompt:
             # Save prompt to history file
-            save_prompt_to_history(prompt)
+            save_chat_to_history("prompt", "user", prompt)
             
             send_message(chat, prompt)
 
-
-def save_response_to_history(response):
-    """Save the response to the history.json file."""
-    import json
-    
-    history_file = "history.json"
-    try:
-        # Load existing history
-        try:
-            with open(history_file, "r") as file:
-                history = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            history = []
-
-        # Append new response to history
-        history.append({"role": "model", "parts": response})
-
-        # Save updated history
-        with open(history_file, "w") as file:
-            json.dump(history, file, indent=4)
-
-    except Exception as e:
-        console.print(f"Error saving response to history: {e}", style="bold red")
-
-def save_prompt_to_history(prompt):
+def save_chat_to_history(type, role, content):
     """Save the user's prompt to the history.json file."""
     import json
     
@@ -213,15 +189,15 @@ def save_prompt_to_history(prompt):
         except (FileNotFoundError, json.JSONDecodeError):
             history = []
 
-        # Append new prompt to history
-        history.append({"role": "user", "parts": prompt})
+        # Append new string to history
+        history.append({"role": role, "parts": [content]})
 
         # Save updated history
         with open(history_file, "w") as file:
             json.dump(history, file, indent=4)
 
     except Exception as e:
-        console.print(f"Error saving prompt to history: {e}", style="bold red")
+        console.print(f"Error saving {type} to history: {e}", style="bold red")
 
 
 if __name__ == "__main__":
