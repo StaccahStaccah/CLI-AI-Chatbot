@@ -62,7 +62,7 @@ This is a Command Line Interface (CLI) chatbot that uses the Gemini SDK by Googl
 Run the chatbot by executing the following command:
 
 ```sh
-python cli_chatbot.py
+python run.py
 ```
 
 You will see an ASCII art banner and be prompted to start chatting.
