@@ -10,8 +10,8 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 # Local libraries
-from console import console
-from history import save_chat_to_history
+from src.console import console
+from src.history import save_chat_to_history
 
 
 def init_gemini(api_key: str, model_name: str, config):

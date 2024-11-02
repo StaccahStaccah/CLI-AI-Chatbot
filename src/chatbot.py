@@ -11,9 +11,9 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Local libraries
-from gemini import init_gemini, start_chat, send_message
-from history import save_chat_to_history, get_history, delete_history
-from console import console, print_ascii_art
+from src.gemini import init_gemini, start_chat, send_message
+from src.history import save_chat_to_history, get_history, delete_history
+from src.console import console, print_ascii_art
 
 
 def load_env_vars() -> tuple[str, str]:
@@ -54,6 +54,8 @@ def load_configuration() -> dict:
     # Merge default config with loaded config
     final_config = {**default_config, **config}
     
+    print(final_config)
+    
     return genai.GenerationConfig(
         max_output_tokens=final_config["max_tokens"],
         temperature=final_config["temperature"],
@@ -62,7 +64,7 @@ def load_configuration() -> dict:
     )
 
 
-def main():
+def start_chatbot():
     """Main function to run the chatbot CLI."""
     # Clear terminal and print ascii art
     subprocess.call('clear' if os.name == 'posix' else 'cls', shell=True)
@@ -110,7 +112,3 @@ def main():
             save_chat_to_history("prompt", "user", prompt)
             
             send_message(chat, prompt)
-
-
-if __name__ == "__main__":
-    main()
