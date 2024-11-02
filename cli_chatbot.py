@@ -96,7 +96,13 @@ def start_chat(model):
         ChatSession: The started chat session.
     """
     try:
-        chat = model.start_chat(history=[])
+        # Load chat history
+        try:
+            chat_history = json.load(open("history.json", "r"))
+        except (FileNotFoundError, json.JSONDecodeError):
+            chat_history = [] 
+
+        chat = model.start_chat(history=chat_history)
         return chat
     except Exception as e:
         console.print(f"Error starting chat session: {e}", style="bold red")
@@ -127,6 +133,10 @@ def send_message(chat, prompt):
         # Send user entry to Gemini and read the response in stream
         with console.status("[bold cyan]Thinking...[/bold cyan]", spinner="dots"):
             response = chat.send_message(prompt)
+        
+        # Save chat response to history
+        save_chat_to_history("response", "model", response.text)
+        
         console.print(Panel(Markdown(response.text)), soft_wrap=True)
     except Exception as e:
         console.print(f"Error during chat interaction: {e}", style="bold red")
@@ -161,7 +171,33 @@ def main():
             break
         
         if prompt:
+            # Save prompt to history file
+            save_chat_to_history("prompt", "user", prompt)
+            
             send_message(chat, prompt)
+
+def save_chat_to_history(type, role, content):
+    """Save the user's prompt to the history.json file."""
+    import json
+    
+    history_file = "history.json"
+    try:
+        # Load existing history
+        try:
+            with open(history_file, "r") as file:
+                history = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            history = []
+
+        # Append new string to history
+        history.append({"role": role, "parts": [content]})
+
+        # Save updated history
+        with open(history_file, "w") as file:
+            json.dump(history, file, indent=4)
+
+    except Exception as e:
+        console.print(f"Error saving {type} to history: {e}", style="bold red")
 
 
 if __name__ == "__main__":

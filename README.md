@@ -33,6 +33,14 @@ This is a Command Line Interface (CLI) chatbot that uses the Gemini SDK by Googl
 
 2. Create a `.env` file in the root directory of the project and add your Gemini API key and model name:
 
+> model name list:
+>
+> - gemini-1.5-flash
+> - gemini-1.5-pro
+> - gemini-1.0-pro
+> - text-embedding-004
+> - aqa
+
    ```env
    API_KEY=your_gemini_api_key
    MODEL_NAME=your_model_name
