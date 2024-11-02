@@ -11,9 +11,10 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Local libraries
+from src.console import console, print_ascii_art
+from src.context import get_contexts
 from src.gemini import init_gemini, start_chat, send_message
 from src.history import save_chat_to_history, get_history, delete_history
-from src.console import console, print_ascii_art
 
 
 def load_env_vars() -> tuple[str, str]:
@@ -53,9 +54,7 @@ def load_configuration() -> dict:
     
     # Merge default config with loaded config
     final_config = {**default_config, **config}
-    
-    print(final_config)
-    
+        
     return genai.GenerationConfig(
         max_output_tokens=final_config["max_tokens"],
         temperature=final_config["temperature"],
@@ -90,10 +89,30 @@ def start_chatbot():
                 history = []
                 break
             elif response.lower() == "y":
+                console.print("Continuing previous chat session...", style="bold yellow")
                 break
             else:
                 console.print("Invalid response. Please enter 'y' or 'n'.", style="bold red")
-        
+    
+    # If is a new chat session, ask user to select a context
+    if history == []:
+        contexts = get_contexts()
+        if contexts:
+            console.print("Who do you want to chat with?", style="bold yellow")
+            for idx, context in enumerate(contexts):
+                console.print(f"{idx+1}. {context['name']}")
+            while True:
+                try:
+                    context_idx = int(console.input("[bold yellow]> [/]")) - 1
+                    if 0 <= context_idx < len(contexts):
+                        break
+                    else:
+                        console.print("Invalid context index. Please try again.", style="bold red")
+                except ValueError:
+                    console.print("Invalid input. Please enter a number.", style="bold red")
+            selected_context = contexts[context_idx]
+            history = [{"role": "user", "parts": [selected_context["context"]]}]
+            save_chat_to_history("context", "user", selected_context["context"])
     
     # Start a new chat session
     chat = start_chat(model, history)
