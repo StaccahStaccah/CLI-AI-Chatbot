@@ -69,7 +69,7 @@ def send_message(chat, prompt):
         # Save chat response to history
         save_chat_to_history("response", "model", response.text)
         
-        console.print(Panel(Markdown(response.text)), soft_wrap=True)
+        console.print(Panel(Markdown(response.text)))
     except Exception as e:
         console.print(f"Error during chat interaction: {e}", style="bold red")
         sys.exit(1)

@@ -4,6 +4,7 @@ import json
 # Local libraries
 from src.console import console
 
+
 def get_history():
     """Load the chat history from the history.json file."""
     try:
