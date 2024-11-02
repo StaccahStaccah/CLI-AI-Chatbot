@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 
 # Local libraries
 from gemini import init_gemini, start_chat, send_message
-from history import save_chat_to_history
-from console import console
+from history import save_chat_to_history, get_history, delete_history
+from console import console, print_ascii_art
 
 
 def load_env_vars() -> tuple[str, str]:
@@ -60,19 +60,6 @@ def load_configuration() -> dict:
         top_k=final_config["top_k"],
         top_p=final_config["top_p"]
     )
-    
-
-def print_ascii_art():
-    """Print ASCII art for the chatbot CLI."""
-    ascii_art = """
-   ___                 __        _   ___ 
-  / __|___ _ __  _ __  \_\_     /_\ |_ _|
- | (__/ _ \ '  \| '_ \/ _` |   / _ \ | | 
-  \___\___/_|_|_| .__/\__,_|  /_/ \_\___|
-                |_|                      
-                        
-    """    
-    console.print(ascii_art, style="bold magenta", highlight=False)
 
 
 def main():
@@ -90,8 +77,24 @@ def main():
     # Initialize Gemini 
     model = init_gemini(api_key, model_name, config)
     
+    # Check if history file exists
+    history = get_history()
+    if history != []:
+        console.print("Do you want to continue the previous chat session? (y/n)", style="bold yellow")
+        while True:
+            response = console.input("[bold yellow]> [/]")
+            if response.lower() == "n":
+                delete_history()
+                history = []
+                break
+            elif response.lower() == "y":
+                break
+            else:
+                console.print("Invalid response. Please enter 'y' or 'n'.", style="bold red")
+        
+    
     # Start a new chat session
-    chat = start_chat(model)
+    chat = start_chat(model, history)
         
     console.print("Hi, how can I assist you today? Feel free to ask anything! (Type '!exit' to quit)", style="bold cyan")
     

@@ -37,7 +37,7 @@ def init_gemini(api_key: str, model_name: str, config):
         sys.exit(1)
 
 
-def start_chat(model):
+def start_chat(model, history):
     """Start a new chat session.
 
     Args:
@@ -47,13 +47,7 @@ def start_chat(model):
         ChatSession: The started chat session.
     """
     try:
-        # Load chat history
-        try:
-            chat_history = json.load(open("history.json", "r"))
-        except (FileNotFoundError, json.JSONDecodeError):
-            chat_history = [] 
-
-        chat = model.start_chat(history=chat_history)
+        chat = model.start_chat(history=history)
         return chat
     except Exception as e:
         console.print(f"Error starting chat session: {e}", style="bold red")

@@ -1,5 +1,27 @@
+# Built-in libraries
+import json
+
 # Local libraries
 from console import console
+
+def get_history():
+    """Load the chat history from the history.json file."""
+    try:
+        with open("history.json", "r") as file:
+            history = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        history = []
+    
+    return history
+
+
+def delete_history():
+    """Delete the chat history from the history.json file."""
+    try:
+        with open("history.json", "w") as file:
+            file.write("[]")
+    except Exception as e:
+        console.print(f"Error deleting history: {e}", style="bold red")
 
 
 def save_chat_to_history(type, role, content):
