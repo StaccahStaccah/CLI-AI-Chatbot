@@ -99,6 +99,5 @@ You can modify the behavior of the model by changing the values in `config.json`
 
 ## 🐞 Known Issues
 
-- Currently, the chat history is not persistent between sessions.
 - The `!exit` command is the only way to end the session; there is no alternative exit command.
 
