@@ -81,8 +81,14 @@ You can modify the behavior of the model by changing the values in `config.json`
 
 ## 📁 File Structure
 
-- `cli_chatbot.py`: The main script to run the chatbot.
+- src/
+  - `chatbot.py`: The main script to run the chatbot.
+  - `console.py`: Secondary script for console functions.
+  - `context.py`: Context management for the chatbot.
+  - `gemini.py`: Wrapper for the Gemini SDK.
+  - `history.py`: Chat history management.
 - `config.json`: Configuration file for model parameters.
+- `context.json`: Contains the chat context for chat initialization.
 - `.env`: Environment variables, including the API key and model name.
 - `requirements.txt`: List of dependencies to install.
 
